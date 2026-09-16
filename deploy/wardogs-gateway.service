@@ -1,0 +1,22 @@
+[Unit]
+Description=Wardogs RCON API Gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=wardogs
+Group=wardogs
+WorkingDirectory=/opt/wardogs-gateway
+EnvironmentFile=/etc/wardogs-gateway.env
+ExecStart=/opt/wardogs-gateway/.venv/bin/python -m wardogs_gateway --config /opt/wardogs-gateway/gateway.toml serve
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/wardogs-gateway/data /opt/wardogs-gateway/logs
+
+[Install]
+WantedBy=multi-user.target

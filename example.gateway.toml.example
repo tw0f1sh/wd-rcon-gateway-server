@@ -1,0 +1,16 @@
+[gateway]
+# Das RCON-Ziel. Das Master-Passwort steht NICHT in dieser Datei.
+rcon_base_url = "http://162.120.3.124:1111/v1"
+request_timeout = 10
+
+# Lokal hinter nginx lauschen. Nicht direkt öffentlich binden, wenn nginx/TLS davor sitzt.
+listen_host = "127.0.0.1"
+listen_port = 1112
+
+database = "data/gateway.db"
+log_file = "logs/gateway.log"
+
+# 0 = deaktiviert. Das RCON meldet aktuell 600 Requests/Minute/IP; da alle Clients
+# über eine Gateway-IP kommen, hält 540 etwas Reserve frei.
+global_requests_per_minute = 540
+per_key_requests_per_minute = 180
