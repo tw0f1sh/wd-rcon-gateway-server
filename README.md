@@ -1,4 +1,4 @@
-# Wardogs RCON Gateway 1.0.0
+# Wardogs RCON Gateway 1.1.0
 
 This gateway sits between the Wardogs Admin Client and the actual Bearer-authenticated RCON service. The client **no longer receives the master RCON password**, but instead uses an API key issued by the Gateway. The Gateway validates the key and its endpoint permissions, then forwards permitted requests to the real RCON service using the master password.
 
@@ -13,6 +13,10 @@ This gateway sits between the Wardogs Admin Client and the actual Bearer-authent
 - [**wd-rcon-gateway-client**](https://github.com/tw0f1sh/wd-rcon-gateway-client)
 
 ---
+
+## Update 1.0.0 -> 1.1.0
+
+- added a cache to prevent multiple scripts run into rate limits from the rcon backend (600 requests / min per IP)
 
 ## Roles
 
