@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-if [[ $EUID -ne 0 ]]; then
-  echo "Bitte als root ausführen." >&2
-  exit 1
-fi
-
+if [[ $EUID -ne 0 ]]; then echo "Bitte als root ausführen." >&2; exit 1; fi
 APP=/opt/wardogs-gateway
 id wardogs >/dev/null 2>&1 || useradd --system --home "$APP" --shell /usr/sbin/nologin wardogs
 mkdir -p "$APP" "$APP/data" "$APP/logs"
@@ -23,7 +18,6 @@ if [[ ! -f /etc/wardogs-gateway.env ]]; then
   echo "WICHTIG: /etc/wardogs-gateway.env bearbeiten und Master-RCON-Token setzen."
 fi
 systemctl daemon-reload
-
 echo "Installation vorbereitet. Danach:"
 echo "  nano /etc/wardogs-gateway.env"
 echo "  nano $APP/gateway.toml"

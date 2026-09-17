@@ -3,10 +3,6 @@ from __future__ import annotations
 import re
 from functools import lru_cache
 
-
-# admin = genau die Funktionen, die das normale GUI für OVERVIEW und
-# PLAYER ADMINISTRATION benötigt. Full-Admin erbt nicht diese Liste,
-# sondern darf standardmäßig alle /v1-Routen.
 ADMIN_ROUTES: tuple[str, ...] = (
     "GET /v1/health",
     "GET /v1/capabilities",
@@ -39,8 +35,6 @@ def normalize_permission(value: str) -> str:
 
 @lru_cache(maxsize=1024)
 def _pattern_regex(pattern_path: str) -> re.Pattern[str]:
-    # {id}, {steamId}, {map}, ... matchen genau ein Segment.
-    # * matcht innerhalb eines Segments, ** über Segmentgrenzen hinweg.
     token = "__DOUBLE_STAR__"
     escaped = re.escape(pattern_path.replace("**", token))
     escaped = escaped.replace(re.escape(token), ".*")
@@ -63,7 +57,6 @@ def effective_permissions(role: str, custom_permissions: list[str] | None) -> li
     if role == "admin":
         return list(ADMIN_ROUTES)
     if role == "full_admin":
-        # None bedeutet hier: alle Methoden/Pfade unter /v1 erlaubt.
         return None
     raise ValueError(f"Unbekannte Rolle: {role}")
 
@@ -77,9 +70,7 @@ def is_allowed(role: str, custom_permissions: list[str] | None, method: str, pat
     return any(permission_matches(item, method, path) for item in permissions)
 
 
-def filter_capability_routes(
-    routes: list[object], role: str, custom_permissions: list[str] | None
-) -> list[object]:
+def filter_capability_routes(routes: list[object], role: str, custom_permissions: list[str] | None) -> list[object]:
     filtered: list[object] = []
     for route in routes:
         if not isinstance(route, str):

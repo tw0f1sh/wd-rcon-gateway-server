@@ -12,7 +12,6 @@ from typing import Iterable
 
 from .permissions import ROLES, normalize_permission
 
-
 KEY_PREFIX = "wdg"
 
 
@@ -113,14 +112,7 @@ class KeyStore:
             rows = conn.execute("SELECT * FROM api_keys ORDER BY created_at DESC").fetchall()
         return [self._row_to_record(row) for row in rows]
 
-    def create(
-        self,
-        name: str,
-        role: str,
-        *,
-        permissions: Iterable[str] | None = None,
-        expires_days: int | None = None,
-    ) -> tuple[ApiKeyRecord, str]:
+    def create(self, name: str, role: str, *, permissions: Iterable[str] | None = None, expires_days: int | None = None) -> tuple[ApiKeyRecord, str]:
         name = name.strip()
         if not name:
             raise ValueError("Name darf nicht leer sein.")
@@ -152,10 +144,7 @@ class KeyStore:
         secret = secrets.token_urlsafe(32)
         raw_key = f"{KEY_PREFIX}_{public_id}_{secret}"
         with self._connect() as conn:
-            conn.execute(
-                "UPDATE api_keys SET key_hash = ?, active = 1 WHERE public_id = ?",
-                (hash_key(raw_key), public_id),
-            )
+            conn.execute("UPDATE api_keys SET key_hash = ?, active = 1 WHERE public_id = ?", (hash_key(raw_key), public_id))
         updated = self.get(public_id)
         assert updated is not None
         return updated, raw_key
@@ -181,11 +170,7 @@ class KeyStore:
                 raise KeyError(public_id)
 
     def set_permissions(self, public_id: str, permissions: Iterable[str] | None) -> None:
-        if permissions is None:
-            payload = None
-        else:
-            normalized = [normalize_permission(item) for item in permissions]
-            payload = json.dumps(normalized, ensure_ascii=False)
+        payload = None if permissions is None else json.dumps([normalize_permission(item) for item in permissions], ensure_ascii=False)
         with self._connect() as conn:
             cur = conn.execute("UPDATE api_keys SET permissions_json = ? WHERE public_id = ?", (payload, public_id))
             if cur.rowcount != 1:
@@ -201,8 +186,6 @@ class KeyStore:
         if not hmac.compare_digest(record.key_hash, hash_key(raw_key)):
             return None
         now = iso(utc_now())
-        # last_used_at höchstens einmal pro Minute aktualisieren, damit das
-        # 3-Sekunden-GUI-Polling SQLite nicht unnötig beschreibt.
         cutoff = iso(utc_now() - timedelta(minutes=1))
         with self._connect() as conn:
             conn.execute(
